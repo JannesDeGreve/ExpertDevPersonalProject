@@ -1,97 +1,98 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
-public class PlacementIndicator : MonoBehaviour
-{
+public class PlacementIndicator : MonoBehaviour {
     private ARRaycastManager rayManager;
     private GameObject visual;
+    public Text instructionText;
     bool isCreated = false;
-
-    //private GameObject variableForPrefab;
-    //public GameObject myPrefab;
+    bool selectionIsMade = false;
 
     private GameObject foodPrefab;
-    
+    private GameObject cubePrefab;
+    public List<GameObject> objectArray;
 
-    void Start ()
-    {
+    public Button firstButton, secondButton;
+    int objectToRender;
 
-        foodPrefab = (GameObject)Resources.Load("prefabs/NoodleMeshCleaned", typeof(GameObject));
+    void Start () {
+
+        foodPrefab = (GameObject) Resources.Load ("prefabs/NoodleMeshCleaned", typeof (GameObject));
+        cubePrefab = (GameObject) Resources.Load ("prefabs/Cube", typeof (GameObject));
+
+        objectArray.Add (foodPrefab);
+        objectArray.Add (cubePrefab);
 
         //foodPrefab = Instantiate(Resources.Load("prefabs/cube", typeof(GameObject))) as GameObject;
 
         // get the components
-        rayManager = FindObjectOfType<ARRaycastManager>();
-        visual = transform.GetChild(0).gameObject;
+        rayManager = FindObjectOfType<ARRaycastManager> ();
+        visual = transform.GetChild (0).gameObject;
 
         // hide the placement indicator visual
-        visual.SetActive(false);
+        visual.SetActive (false);
+        firstButton.onClick.AddListener (handleClickFirstButton);
+        secondButton.onClick.AddListener (handleClickSecondButton);
+
     }
 
-    
-    void Update ()
-    {
+    void handleClickFirstButton () {
+        objectToRender = 0;
+        Destroy (firstButton.gameObject);
+        Destroy (secondButton.gameObject);
+        selectionIsMade = true;
+    }
+
+    void handleClickSecondButton () {
+        objectToRender = 1;
+        Destroy (firstButton.gameObject);
+        Destroy (secondButton.gameObject);
+        selectionIsMade = true;
+
+    }
+
+    void Update () {
         // shoot a raycast from the center of the screen
-        List<ARRaycastHit> hits = new List<ARRaycastHit>();
-        rayManager.Raycast(new Vector2(Screen.width / 2, Screen.height / 2), hits, TrackableType.Planes);
+        List<ARRaycastHit> hits = new List<ARRaycastHit> ();
+        rayManager.Raycast (new Vector2 (Screen.width / 2, Screen.height / 2), hits, TrackableType.Planes);
 
         // if we hit an AR plane surface, update the position and rotation
-        if(hits.Count > 0)
-        {
+        if (hits.Count > 0) {
             transform.position = hits[0].pose.position;
             transform.rotation = hits[0].pose.rotation;
+        }
 
-            // foodPrefab.transform.position = hits[0].pose.position;
-            // foodPrefab.transform.rotation = hits[0].pose.rotation;
+        if (selectionIsMade == true) {
 
             // enable the visual if it's disabled
-             if(isCreated == false)
-                    {
-                        // foodPrefab.transform.position = hitPose.position;
-                        // foodPrefab.transform.rotation = hitPose.rotation;
-                        // isCreated = true;
-                        visual.SetActive(true);
-                    }
+            if (isCreated == false) {
+                visual.SetActive (true);
+                //instructionText.text = "Druk op het scherm om jouw gerecht te zien";
+
+            } else {
+                visual.SetActive (false);
+            }
             // if(!visual.activeInHierarchy)
             //     visual.SetActive(true);
 
-              if (Input.touchCount > 0)
-                {
+            if (Input.touchCount > 0) {
+                Touch touch = Input.GetTouch (0);
+                var hitPose = hits[0].pose;
+                instructionText.text = "";
 
-                    var hitPose = hits[0].pose;
+                if (touch.phase == TouchPhase.Ended) {
 
-                    if(isCreated == false)
-                    {
-                        Instantiate(foodPrefab, hitPose.position, hitPose.rotation);
-
-                        // foodPrefab.transform.position = hitPose.position;
-                        // foodPrefab.transform.rotation = hitPose.rotation;
+                    if (isCreated == false) {
+                        //Instantiate (cubePrefab, hitPose.position, hitPose.rotation);
+                        Instantiate (objectArray[objectToRender], hitPose.position, hitPose.rotation);
                         isCreated = true;
                     }
-                    else
-                    {
-                        //foodPrefab.SetActive(true);
-                        visual.SetActive(false);
-
-
-                    }
-                    //  if (foodPrefab == null)
-                    //     {
-                    //         Instantiate(foodPrefab, hitPose.position, hitPose.rotation);
-                    //     }
-                    //     else
-                    //     {
-                    //         visual.SetActive(false);
-
-                    //     }
-
-                    //Touch touch = Input.GetTouch(0);
-                    //touchPosition = Input.getTouch(0).position
-
                 }
+            }
         }
     }
 }
