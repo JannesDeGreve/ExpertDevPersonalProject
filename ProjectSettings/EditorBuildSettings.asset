@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Startscreen.unity
     guid: f7851cae57f2e434082b19ccba17a6ab
   - enabled: 1
+    path: Assets/Scenes/OCROnboarding.unity
+    guid: 7cf80dc2a00d5479fa9c53297e6ba523
+  - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: c4c64fac3b169498a86e111fb1ec96fe
   m_configObjects:

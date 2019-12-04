@@ -12,7 +12,6 @@ public class RestaurantSelectionScreen : MonoBehaviour {
     public Button button4;
     // Start is called before the first frame update
     void Start () {
-
         button1.onClick.AddListener (handleClickButton);
         button2.onClick.AddListener (handleClickButton);
         button3.onClick.AddListener (handleClickButton);
@@ -21,7 +20,7 @@ public class RestaurantSelectionScreen : MonoBehaviour {
     }
 
     void handleClickButton () {
-        SceneManager.LoadScene (1);
+        SceneManager.LoadScene ("OCROnboarding");
     }
 
     // Update is called once per frame
