@@ -18,6 +18,9 @@ EditorBuildSettings:
     path: Assets/Scenes/OCRMain.unity
     guid: 7afcb9110429e415688e6d35ae8c6ea6
   - enabled: 1
+    path: Assets/Scenes/ARDishSelectionMenu.unity
+    guid: 571262c8a28e54f4e800779775254665
+  - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: c4c64fac3b169498a86e111fb1ec96fe
   m_configObjects:

@@ -21,6 +21,9 @@ public class PlacementIndicator : MonoBehaviour {
 
     void Start () {
 
+        // static var
+        Debug.Log (ARDishSelectionMenu.selectedDish);
+
         foodPrefab = (GameObject) Resources.Load ("prefabs/NoodleMeshCleaned", typeof (GameObject));
         cubePrefab = (GameObject) Resources.Load ("prefabs/Cube", typeof (GameObject));
 
