@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class OCRMain : MonoBehaviour {
@@ -16,7 +17,7 @@ public class OCRMain : MonoBehaviour {
 
     //OCR
     private string url = "https://vision.googleapis.com/v1/images:annotate?key=";
-    private string apiKey = "AIzaSyBke3ovriQ-kusKMS2J9kN4NOolX4tnJ8I";
+    public string apiKey = "";
     private FeatureType featureType = FeatureType.TEXT_DETECTION;
     public int maxResults = 10;
 
@@ -234,8 +235,10 @@ public class OCRMain : MonoBehaviour {
 
                 foreach (string matchedText in matchedDishes) {
                     Debug.Log (matchedText);
-                    myText.text = $"{myText.text} \n {matchedText}";
+                    //myText.text = $"{myText.text} \n {matchedText}";
                 }
+
+                SceneManager.LoadScene ("ARDishSelectionMenu");
 
                 //var index = Array.FindIndex(stringArray, x => x == value)
             }
