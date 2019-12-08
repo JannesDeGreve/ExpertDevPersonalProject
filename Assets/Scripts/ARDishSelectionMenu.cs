@@ -16,18 +16,18 @@ public class ARDishSelectionMenu : MonoBehaviour {
 
     public static string selectedDish;
 
-    public List<string> matchedDishes;
+    // public List<string> matchedDishes;
     public Vector3 positionVector = new Vector3 (0, 0, 0);
 
     void Start () {
         // matchedDishes = new List<string> ();
 
-        matchedDishes.Add ("Spaghetti Bolognese");
-        matchedDishes.Add ("Biefstuk met frieten");
-        matchedDishes.Add ("Lasagne");
-        matchedDishes.Add ("Een gerecht met een lange naam");
+        // matchedDishes.Add ("Spaghetti Bolognese");
+        // matchedDishes.Add ("Biefstuk met frieten");
+        // matchedDishes.Add ("Lasagne");
+        // matchedDishes.Add ("Een gerecht met een lange naam");
 
-        foreach (string dish in matchedDishes) {
+        foreach (string dish in OCRMain.matchedDishes) {
             Debug.Log (dish);
             GameObject button = (GameObject) Instantiate (buttonPrefab);
             Debug.Log (button);
@@ -36,7 +36,7 @@ public class ARDishSelectionMenu : MonoBehaviour {
             button.transform.SetParent (menuPanel.transform, false);
             button.transform.position += positionVector;
 
-            positionVector[1] -= 200;
+            positionVector[1] -= 250;
 
             button.GetComponent<Button> ().onClick.AddListener (() => handleClickButton (dish));
 

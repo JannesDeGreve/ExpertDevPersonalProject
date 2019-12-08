@@ -10,7 +10,7 @@ public class PlacementIndicator : MonoBehaviour {
     private GameObject visual;
     public Text instructionText;
     bool isCreated = false;
-    bool selectionIsMade = false;
+    //bool selectionIsMade = false;
 
     private GameObject foodPrefab;
     private GameObject cubePrefab;

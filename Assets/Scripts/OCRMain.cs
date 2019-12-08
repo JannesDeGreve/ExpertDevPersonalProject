@@ -27,7 +27,7 @@ public class OCRMain : MonoBehaviour {
     public static List<string> matchedDishes;
 
     public Button myButton;
-    public Text myText;
+    // public Text myText;
 
     [System.Serializable]
     public class AnnotateImageRequests {
