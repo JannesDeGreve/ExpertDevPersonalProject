@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -53,15 +54,15 @@ public class OCRMain : MonoBehaviour {
 
     [System.Serializable]
     public class ImageContext {
-        public LatLongRect latLongRect;
+        // public LatLongRect latLongRect;
         public List<string> languageHints;
     }
 
-    [System.Serializable]
-    public class LatLongRect {
-        public LatLng minLatLng;
-        public LatLng maxLatLng;
-    }
+    // [System.Serializable]
+    // public class LatLongRect {
+    //     public LatLng minLatLng;
+    //     public LatLng maxLatLng;
+    // }
 
     [System.Serializable]
     public class AnnotateImageResponses {
@@ -78,32 +79,105 @@ public class OCRMain : MonoBehaviour {
         public string description;
     }
 
-    [System.Serializable]
-    public class LatLng {
-        float latitude;
-        float longitude;
-    }
+    // [System.Serializable]
+    // public class LatLng {
+    //     float latitude;
+    //     float longitude;
+    // }
 
     public enum FeatureType {
         TEXT_DETECTION
     }
 
+    private string newUrl = "https://firestore.googleapis.com/v1/projects/arfoodappocr/databases/(default)/documents/restaurants/";
+
+    [System.Serializable]
+    public class Latitude {
+        public double doubleValue;
+    }
+
+    [System.Serializable]
+    public class RestaurantName {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Path {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Dish {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Fields2 {
+        public Path path;
+        public Dish dish;
+    }
+
+    [System.Serializable]
+    public class MapValue {
+        public Fields2 fields;
+    }
+
+    [System.Serializable]
+    public class Value {
+        public MapValue mapValue;
+    }
+
+    [System.Serializable]
+    public class ArrayValue {
+        public List<Value> values;
+    }
+
+    [System.Serializable]
+    public class Dishes {
+        public ArrayValue arrayValue;
+    }
+
+    [System.Serializable]
+    public class Longitude {
+        public double doubleValue;
+    }
+
+    [System.Serializable]
+    public class Fields {
+        public Latitude latitude;
+        public RestaurantName restaurantName;
+        public Dishes dishes;
+        public Longitude longitude;
+    }
+
+    [System.Serializable]
+    public class Document {
+        public string name;
+        public Fields fields;
+        public DateTime createTime;
+        public DateTime updateTime;
+    }
+
+    [System.Serializable]
+    public class RootObject {
+        public List<Document> documents;
+    }
+
+    public RootObject restaurantResponses;
+
     // Start is called before the first frame update
     void Start () {
-        dishes = new List<string> ();
-        dishes.Add ("Bavik");
-        dishes.Add ("Sportcafe@d&m");
-        dishes.Add ("Kuurne");
-        dishes.Add ("Appeltaart");
-        dishes.Add ("Goed voor 1 gewone consumptie");
+        //dishes = new List<string> ();
 
-        dishes.Add ("Spaghetti Bolognese");
-        dishes.Add ("Biefstuk met frieten");
-        dishes.Add ("Lasagne");
-        dishes.Add ("Een gerecht met een lange naam");
+        // dishes.Add ("Spaghetti Bolognese");
+        // dishes.Add ("Biefstuk met frieten");
+        // dishes.Add ("Lasagne");
+        // dishes.Add ("Een gerecht met een lange naam");
 
         headers = new Dictionary<string, string> ();
         headers.Add ("Content-Type", "application/json; charset=UTF-8");
+
+        StartCoroutine ("FetchRestaurantData");
 
         if (apiKey == null || apiKey == "")
             Debug.LogError ("No API key. Please set your API key into the \"Web Cam Texture To Cloud Vision(Script)\" component.");
@@ -135,6 +209,7 @@ public class OCRMain : MonoBehaviour {
 
         Button btn = myButton.GetComponent<Button> ();
         btn.onClick.AddListener (handleClickButton);
+
     }
 
     void handleClickButton () {
@@ -244,6 +319,105 @@ public class OCRMain : MonoBehaviour {
             }
 
         }
+    }
+
+    private IEnumerator FetchRestaurantData () {
+
+        // Function to fetch json data from firestore database
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get (newUrl)) {
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest ();
+
+            string[] pages = newUrl.Split ('/');
+            int page = pages.Length - 1;
+
+            if (webRequest.isNetworkError) {
+                // Throw an error if there is an error
+                Debug.Log (pages[page] + ": Error: " + webRequest.error);
+            } else {
+
+                Debug.Log (webRequest.downloadHandler.text);
+
+                // Deserialize the JSON data
+                string jsonString = webRequest.downloadHandler.text;
+                restaurantResponses = JsonUtility.FromJson<RootObject> (jsonString);
+
+                handleFetchResponse ();
+
+                //Debug.Log (responses.fields.dishes.arrayValue.values[0].mapValue.fields.dish.stringValue);
+
+                // foreach (var restaurant in responses.) {
+                //     Debug.Log (restaurant.name);
+
+                //     // double restaurantLatitude = restaurant.fields.latitude.doubleValue;
+                //     // double restaurantLongitude = restaurant.fields.longitude.doubleValue;
+
+                //     // Debug.Log (restaurantLatitude);
+                //     // Debug.Log (restaurantLongitude);
+
+                //     // if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
+                //     //     Debug.Log ("juiste locatie");
+                //     //     currentLocation = restaurant.fields.restaurantName.stringValue;
+
+                //     //     // load the next scene
+                //     //     SceneManager.LoadScene ("OCROnboarding");
+                //     //     return;
+
+                //     // } else {
+                //     //     Debug.Log ("niet juiste locatie");
+                //     // }
+
+                // }
+            }
+        }
+
+    }
+
+    public void handleFetchResponse () {
+        //ebug.Log (restaurantResponses.name);
+
+        dishes = new List<string> ();
+
+        // Fields fields = new Fields ();
+        // fields = restaurantResponses.fields;
+        // Latitude restoLatitude = new Latitude ();
+        // restoLatitude = fields.latitude;
+        // Debug.Log (restoLatitude);
+
+        foreach (var restaurant in restaurantResponses.documents) {
+
+            if (restaurant.name == "projects/arfoodappocr/databases/(default)/documents/restaurants/0O4UM6nOfW7lErHT0feJ") {
+                Debug.Log ("deze log zie ik maar1 keer");
+
+                foreach (var dish in restaurant.fields.dishes.arrayValue.values) {
+                    Debug.Log (dish.mapValue.fields.dish.stringValue);
+                    dishes.Add (dish.mapValue.fields.dish.stringValue);
+
+                }
+
+            }
+
+            // double restaurantLatitude = restaurant.fields.latitude.doubleValue;
+            // double restaurantLongitude = restaurant.fields.longitude.doubleValue;
+
+            // Debug.Log (restaurantLatitude);
+            // Debug.Log (restaurantLongitude);
+
+            // if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
+            //     Debug.Log ("juiste locatie");
+            //     currentLocation = restaurant.fields.restaurantName.stringValue;
+
+            //     // load the next scene
+            //     SceneManager.LoadScene ("OCROnboarding");
+            //     return;
+
+            // } else {
+            //     Debug.Log ("niet juiste locatie");
+            // }
+
+        }
+
     }
 
     // Update is called once per frame

@@ -300,8 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83352e30c831a44f499edb98352a0070, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  backButton: {fileID: 0}
-  continueButton: {fileID: 0}
+  currentRestaurant: {fileID: 1986012380}
 --- !u!1 &927702083
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,7 +715,7 @@ GameObject:
   - component: {fileID: 1986012381}
   - component: {fileID: 1986012380}
   m_Layer: 5
-  m_Name: Text
+  m_Name: CurrentRestaurant
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -738,7 +737,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -11.976}
+  m_AnchoredPosition: {x: 0, y: -11.976013}
   m_SizeDelta: {x: -48, y: -71.951}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1986012380

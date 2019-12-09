@@ -1,17 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // Add the TextMesh Pro namespace to access the various functions.
+using UnityEngine.UI;
 
 public class RestaurantSelectionScreen : MonoBehaviour {
-
-    // public Button button1;
-    // public Button button2;
-    // public Button button3;
-    // public Button button4;
-    // public Text textField;
 
     [System.Serializable]
     public class LatLng {
@@ -19,73 +15,127 @@ public class RestaurantSelectionScreen : MonoBehaviour {
         public float longitude;
     }
 
-    public static LatLng locationInfo;
     public static string currentLocation;
 
-    // [System.Serializable]
-    // public class Restaurants {
-    //     public List<Restaurant> restaurants;
-    // }
+    //private string url = "https://storage.googleapis.com/ocrfoodappbucket/restaurants/restaurants.json";
+    private string newUrl = "https://firestore.googleapis.com/v1/projects/arfoodappocr/databases/(default)/documents/restaurants";
+    Dictionary<string, string> headers;
 
-    // [System.Serializable]
-    // public class Restaurant {
-    //      float restaurantLat;
-    //      float restaurantLong;
-    //      string restaurantName;
-    // }
+    public LatLng locationInfo;
 
-    //public static RestaurantSelectionScreen Instance { get; set; }
+    [System.Serializable]
+    public class Latitude {
+        public double doubleValue;
+    }
 
-    // Restaurants restaurants;
-    // Restaurant restaurant1;
-    // Restaurant restaurant2;
-    // public Restaurant[] myArray;
+    [System.Serializable]
+    public class RestaurantName {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Path {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Dish {
+        public string stringValue;
+    }
+
+    [System.Serializable]
+    public class Fields2 {
+        public Path path;
+        public Dish dish;
+    }
+
+    [System.Serializable]
+    public class MapValue {
+        public Fields2 fields;
+    }
+
+    [System.Serializable]
+    public class Value {
+        public MapValue mapValue;
+    }
+
+    [System.Serializable]
+    public class ArrayValue {
+        public List<Value> values;
+    }
+
+    [System.Serializable]
+    public class Dishes {
+        public ArrayValue arrayValue;
+    }
+
+    [System.Serializable]
+    public class Longitude {
+        public double doubleValue;
+    }
+
+    [System.Serializable]
+    public class Fields {
+        public Latitude latitude;
+        public RestaurantName restaurantName;
+        public Dishes dishes;
+        public Longitude longitude;
+    }
+
+    [System.Serializable]
+    public class Document {
+        public string name;
+        public Fields fields;
+        public DateTime createTime;
+        public DateTime updateTime;
+    }
+
+    [System.Serializable]
+    public class RootObject {
+        public List<Document> documents;
+    }
+
+    public RootObject responses;
 
     void Start () {
 
-        //Instance = this;
-        //DontDestroyOnLoad (gameObject);
-        Debug.Log ("start log");
+        // Set the headers
+        headers = new Dictionary<string, string> ();
+        headers.Add ("Content-Type", "application/json; charset=UTF-8");
 
-        //create an array of your new type
-        // Restaurant[] myArray = new Restaurant[2];
-
-        //Debug.Log (myArray[0].restaurantLat);
-
-        //assign Value1 of myClassArray[someIndex] to someValue
-        // myArray[0].restaurantLat = 50.8493271f;
-        // myArray[0].restaurantLong = 3.27963328f;
-        // myArray[0].restaurantName = "huis";
-
-        // myArray[1].restaurantLat = 51.8493271f;
-        // myArray[1].restaurantLong = 4.27963328f;
-        // myArray[1].restaurantName = "resto 2";
-
-        // restaurants = new Restaurants (); 
-        // restaurants.restaurants = new List<Restaurant> ();
-
-        // Restaurant restaurant1 = new Restaurant ();
-        // restaurant1.coordinates.latitude = 50.8493271f;
-        // restaurant1.coordinates.longitude = 3.27963328f;
-        // restaurant1.restaurantName = "huis";
-
-        // restaurants.restaurants.Add (restaurant1);
-
-        // Restaurant restaurant2 = new Restaurant ();
-        // restaurant2.coordinates.latitude = 51.8493271f;
-        // restaurant2.coordinates.longitude = 4.27963328f;
-        // restaurant2.restaurantName = "tweede resto";
-
-        //restaurants.restaurants.Add (restaurant2);
-
-        // button1.onClick.AddListener (handleClickButton);
-        // button2.onClick.AddListener (handleClickButton);
-        // button3.onClick.AddListener (handleClickButton);
-        // button4.onClick.AddListener (handleClickButton);
-
+        // Start locationhandler and fetchrestaurantdata
         StartCoroutine ("LocationHandler");
+        StartCoroutine ("FetchRestaurantData");
+    }
+
+    private IEnumerator FetchRestaurantData () {
+
+        // Function to fetch json data from firestore database
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get (newUrl)) {
+            // Request and wait for the desired page.
+            yield return webRequest.SendWebRequest ();
+
+            string[] pages = newUrl.Split ('/');
+            int page = pages.Length - 1;
+
+            if (webRequest.isNetworkError) {
+                // Throw an error if there is an error
+                Debug.Log (pages[page] + ": Error: " + webRequest.error);
+            } else {
+
+                Debug.Log (webRequest.downloadHandler.text);
+
+                // Deserialize the JSON data
+                string jsonString = webRequest.downloadHandler.text;
+                responses = JsonUtility.FromJson<RootObject> (jsonString);
+
+                CheckLocation ();
+            }
+        }
 
     }
+
     // Start is called before the first frame update
     private IEnumerator LocationHandler () {
         Debug.Log ("script started");
@@ -122,36 +172,48 @@ public class RestaurantSelectionScreen : MonoBehaviour {
             // Access granted and location value could be retrieved
             locationInfo.latitude = Input.location.lastData.latitude;
             locationInfo.longitude = Input.location.lastData.longitude;
-            // textField.text = "Latitude: " + locationInfo.latitude.ToString ("R") + " Longitude: " + locationInfo.longitude.ToString ("R");
-
-            if (locationInfo.latitude <= 50.8493271f + 0.001 && locationInfo.latitude >= 50.8493271f - 0.001 && locationInfo.longitude <= 3.27963328f + 0.001 && locationInfo.longitude >= 3.27963328f - 0.001) {
-                // textField.text = "op de juiste locatie";
-                Debug.Log ("juiste locatie");
-                currentLocation = "Thuis";
-
-                SceneManager.LoadScene ("OCROnboarding");
-
-            } else {
-                Debug.Log ("niet juiste locatie");
-                // textField.text = "niet op de juiste locatie";
-            }
-
-            // foreach (var restaurant in myArray) {
-            //     Debug.Log ("test loop");
-
-            // }
-
-            // Debug.Log ("Location: " + Input.location.lastData.latitude + " " + Input.location.lastData.longitude + " " + Input.location.lastData.altitude + " " + Input.location.lastData.horizontalAccuracy);
+            CheckLocation ();
         }
 
         // Stop service if there is no need to query location updates continuously
         Input.location.Stop ();
-
     }
 
-    // void handleClickButton () {
-    //     SceneManager.LoadScene ("OCROnboarding");
-    // }
+    public void CheckLocation () {
+
+        //Debug.Log (responses.documents[0].name);
+
+        if (responses != null && locationInfo.latitude != null && locationInfo.longitude != null) {
+
+            foreach (var restaurant in responses.documents) {
+
+                double restaurantLatitude = restaurant.fields.latitude.doubleValue;
+                double restaurantLongitude = restaurant.fields.longitude.doubleValue;
+
+                Debug.Log (restaurantLatitude);
+                Debug.Log (restaurantLongitude);
+
+                if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
+                    Debug.Log ("juiste locatie");
+                    currentLocation = restaurant.fields.restaurantName.stringValue;
+
+                    // load the next scene
+                    SceneManager.LoadScene ("OCROnboarding");
+                    return;
+
+                } else {
+                    Debug.Log ("niet juiste locatie");
+                }
+
+            }
+
+            Debug.Log (currentLocation);
+
+        } else {
+            return;
+        }
+
+    }
 
     // Update is called once per frame
     void Update () {

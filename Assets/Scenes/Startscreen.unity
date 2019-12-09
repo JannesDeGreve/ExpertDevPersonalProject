@@ -312,8 +312,8 @@ Camera:
   m_GameObject: {fileID: 561457479}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -415,7 +415,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '[appnaam]'
+  m_text: Menuscan
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -484,7 +484,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: -76.56262}
   m_textInfo:
     textComponent: {fileID: 590795424}
-    characterCount: 9
+    characterCount: 8
     spriteCount: 0
     spaceCount: 0
     wordCount: 1
@@ -629,6 +629,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98f044976fb904bc7a693e8301d25f5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  responses:
+    restaurants: []
+  locationInfo:
+    latitude: 0
+    longitude: 0
 --- !u!1 &1676453081
 GameObject:
   m_ObjectHideFlags: 0
