@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5235681652899306613}
   - component: {fileID: 1708630317290348888}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Lasagne
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 405284413907618830}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 12.129351, y: 518.5519, z: -291.263}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0

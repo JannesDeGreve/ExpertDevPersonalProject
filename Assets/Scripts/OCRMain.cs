@@ -24,11 +24,12 @@ public class OCRMain : MonoBehaviour {
 
     Texture2D texture2D;
     Dictionary<string, string> headers;
-    List<string> dishes;
-    public static List<string> matchedDishes;
+    // List<string> dishes;
+    // public static List<string> matchedDishes;
+    public static Dictionary<string, string> matchedDishesWithPath;
+    public List<string> remainingDishesLeftToMatchWithGeneric;
 
     public Button myButton;
-    // public Text myText;
 
     [System.Serializable]
     public class AnnotateImageRequests {
@@ -54,15 +55,8 @@ public class OCRMain : MonoBehaviour {
 
     [System.Serializable]
     public class ImageContext {
-        // public LatLongRect latLongRect;
         public List<string> languageHints;
     }
-
-    // [System.Serializable]
-    // public class LatLongRect {
-    //     public LatLng minLatLng;
-    //     public LatLng maxLatLng;
-    // }
 
     [System.Serializable]
     public class AnnotateImageResponses {
@@ -79,100 +73,12 @@ public class OCRMain : MonoBehaviour {
         public string description;
     }
 
-    // [System.Serializable]
-    // public class LatLng {
-    //     float latitude;
-    //     float longitude;
-    // }
-
     public enum FeatureType {
         TEXT_DETECTION
     }
 
-    private string newUrl = "https://firestore.googleapis.com/v1/projects/arfoodappocr/databases/(default)/documents/restaurants/";
-
-    [System.Serializable]
-    public class Latitude {
-        public double doubleValue;
-    }
-
-    [System.Serializable]
-    public class RestaurantName {
-        public string stringValue;
-    }
-
-    [System.Serializable]
-    public class Path {
-        public string stringValue;
-    }
-
-    [System.Serializable]
-    public class Dish {
-        public string stringValue;
-    }
-
-    [System.Serializable]
-    public class Fields2 {
-        public Path path;
-        public Dish dish;
-    }
-
-    [System.Serializable]
-    public class MapValue {
-        public Fields2 fields;
-    }
-
-    [System.Serializable]
-    public class Value {
-        public MapValue mapValue;
-    }
-
-    [System.Serializable]
-    public class ArrayValue {
-        public List<Value> values;
-    }
-
-    [System.Serializable]
-    public class Dishes {
-        public ArrayValue arrayValue;
-    }
-
-    [System.Serializable]
-    public class Longitude {
-        public double doubleValue;
-    }
-
-    [System.Serializable]
-    public class Fields {
-        public Latitude latitude;
-        public RestaurantName restaurantName;
-        public Dishes dishes;
-        public Longitude longitude;
-    }
-
-    [System.Serializable]
-    public class Document {
-        public string name;
-        public Fields fields;
-        public DateTime createTime;
-        public DateTime updateTime;
-    }
-
-    [System.Serializable]
-    public class RootObject {
-        public List<Document> documents;
-    }
-
-    public RootObject restaurantResponses;
-
     // Start is called before the first frame update
     void Start () {
-        //dishes = new List<string> ();
-
-        // dishes.Add ("Spaghetti Bolognese");
-        // dishes.Add ("Biefstuk met frieten");
-        // dishes.Add ("Lasagne");
-        // dishes.Add ("Een gerecht met een lange naam");
 
         headers = new Dictionary<string, string> ();
         headers.Add ("Content-Type", "application/json; charset=UTF-8");
@@ -289,132 +195,68 @@ public class OCRMain : MonoBehaviour {
                     System.StringSplitOptions.None
                 );
 
-                matchedDishes = new List<string> ();
+                // CHECK THE MATCHES
 
+                matchedDishesWithPath = new Dictionary<string, string> ();
+                remainingDishesLeftToMatchWithGeneric = new List<string> ();
+
+                //matchedDishes = new List<string> ();
+
+                // loop door alle gedecteerde woorden
                 foreach (string s in detectedTextArray) {
 
-                    foreach (string detectedString in dishes) {
+                    // rest de boolean
+                    bool hasBeenAdded = false;
 
-                        if (detectedString.ToLower () == s.ToLower ()) {
+                    //loop door alle specifieke gerechten
+                    foreach (KeyValuePair<string, string> keyValue in RestaurantSelectionScreen.allDishesFromCurrentRestaurant) {
+                        if (keyValue.Key.ToLower () == s.ToLower ()) {
+
+                            // Er is een match tussen de gedetecteerde tekst en locatie gebaseerde menukaart
                             Debug.Log ("Er is een match: " + s);
-                            matchedDishes.Add (s);
-
+                            matchedDishesWithPath.Add (keyValue.Key, keyValue.Value);
+                            hasBeenAdded = true;
                         }
-                        // Debug.Log ("detected string" + detectedString.ToLower ());
-                        // Debug.Log ("dishes array" + s.ToLower ());
+                    }
+
+                    // Er was geen match tussen de gedetecteerde tekst
+                    // Voeg toe aan de volgende List die met generieke gerechten checkt
+                    if (hasBeenAdded == false) {
+                        remainingDishesLeftToMatchWithGeneric.Add (s);
+
                     }
 
                 }
 
-                Debug.Log (matchedDishes);
-
-                foreach (string matchedText in matchedDishes) {
-                    Debug.Log (matchedText);
-                    //myText.text = $"{myText.text} \n {matchedText}";
+                foreach (string stringsLeftToCheck in remainingDishesLeftToMatchWithGeneric) {
+                    foreach (KeyValuePair<string, string> keyValue in RestaurantSelectionScreen.genericDishes) {
+                        if (keyValue.Key.ToLower () == stringsLeftToCheck.ToLower ()) {
+                            Debug.Log ("Er is een match: " + stringsLeftToCheck);
+                            matchedDishesWithPath.Add (keyValue.Key, keyValue.Value);
+                        }
+                    }
                 }
 
-                SceneManager.LoadScene ("ARDishSelectionMenu");
+                // foreach (string detectedString in dishes) {
 
-                //var index = Array.FindIndex(stringArray, x => x == value)
-            }
+                //     if (detectedString.ToLower () == s.ToLower ()) {
+                //         Debug.Log ("Er is een match: " + s);
+                //         matchedDishes.Add (s);
 
-        }
-    }
-
-    private IEnumerator FetchRestaurantData () {
-
-        // Function to fetch json data from firestore database
-
-        using (UnityWebRequest webRequest = UnityWebRequest.Get (newUrl)) {
-            // Request and wait for the desired page.
-            yield return webRequest.SendWebRequest ();
-
-            string[] pages = newUrl.Split ('/');
-            int page = pages.Length - 1;
-
-            if (webRequest.isNetworkError) {
-                // Throw an error if there is an error
-                Debug.Log (pages[page] + ": Error: " + webRequest.error);
-            } else {
-
-                Debug.Log (webRequest.downloadHandler.text);
-
-                // Deserialize the JSON data
-                string jsonString = webRequest.downloadHandler.text;
-                restaurantResponses = JsonUtility.FromJson<RootObject> (jsonString);
-
-                handleFetchResponse ();
-
-                //Debug.Log (responses.fields.dishes.arrayValue.values[0].mapValue.fields.dish.stringValue);
-
-                // foreach (var restaurant in responses.) {
-                //     Debug.Log (restaurant.name);
-
-                //     // double restaurantLatitude = restaurant.fields.latitude.doubleValue;
-                //     // double restaurantLongitude = restaurant.fields.longitude.doubleValue;
-
-                //     // Debug.Log (restaurantLatitude);
-                //     // Debug.Log (restaurantLongitude);
-
-                //     // if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
-                //     //     Debug.Log ("juiste locatie");
-                //     //     currentLocation = restaurant.fields.restaurantName.stringValue;
-
-                //     //     // load the next scene
-                //     //     SceneManager.LoadScene ("OCROnboarding");
-                //     //     return;
-
-                //     // } else {
-                //     //     Debug.Log ("niet juiste locatie");
-                //     // }
-
+                //     }
+                //     // Debug.Log ("detected string" + detectedString.ToLower ());
+                //     // Debug.Log ("dishes array" + s.ToLower ());
                 // }
-            }
-        }
-
-    }
-
-    public void handleFetchResponse () {
-        //ebug.Log (restaurantResponses.name);
-
-        dishes = new List<string> ();
-
-        // Fields fields = new Fields ();
-        // fields = restaurantResponses.fields;
-        // Latitude restoLatitude = new Latitude ();
-        // restoLatitude = fields.latitude;
-        // Debug.Log (restoLatitude);
-
-        foreach (var restaurant in restaurantResponses.documents) {
-
-            if (restaurant.name == "projects/arfoodappocr/databases/(default)/documents/restaurants/0O4UM6nOfW7lErHT0feJ") {
-                Debug.Log ("deze log zie ik maar1 keer");
-
-                foreach (var dish in restaurant.fields.dishes.arrayValue.values) {
-                    Debug.Log (dish.mapValue.fields.dish.stringValue);
-                    dishes.Add (dish.mapValue.fields.dish.stringValue);
-
-                }
 
             }
 
-            // double restaurantLatitude = restaurant.fields.latitude.doubleValue;
-            // double restaurantLongitude = restaurant.fields.longitude.doubleValue;
+            //Debug.Log (matchedDishes);
 
-            // Debug.Log (restaurantLatitude);
-            // Debug.Log (restaurantLongitude);
-
-            // if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
-            //     Debug.Log ("juiste locatie");
-            //     currentLocation = restaurant.fields.restaurantName.stringValue;
-
-            //     // load the next scene
-            //     SceneManager.LoadScene ("OCROnboarding");
-            //     return;
-
-            // } else {
-            //     Debug.Log ("niet juiste locatie");
+            // foreach (string matchedText in matchedDishes) {
+            //     Debug.Log (matchedText);
             // }
+
+            SceneManager.LoadScene ("ARDishSelectionMenu");
 
         }
 

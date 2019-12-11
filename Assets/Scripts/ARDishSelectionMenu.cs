@@ -14,9 +14,10 @@ public class ARDishSelectionMenu : MonoBehaviour {
     [SerializeField]
     GameObject buttonPrefab;
 
-    public static string selectedDish;
+    //public static string selectedDish;
+    public static KeyValuePair<string, string> selectedDish;
 
-    // public List<string> matchedDishes;
+    //public List<string> matchedDishes;
     public Vector3 positionVector = new Vector3 (0, 0, 0);
 
     void Start () {
@@ -27,18 +28,18 @@ public class ARDishSelectionMenu : MonoBehaviour {
         // matchedDishes.Add ("Lasagne");
         // matchedDishes.Add ("Een gerecht met een lange naam");
 
-        foreach (string dish in OCRMain.matchedDishes) {
-            Debug.Log (dish);
+        foreach (KeyValuePair<string, string> keyValue in OCRMain.matchedDishesWithPath) {
+            Debug.Log (keyValue.Key);
             GameObject button = (GameObject) Instantiate (buttonPrefab);
             Debug.Log (button);
-            button.GetComponentInChildren<Text> ().text = dish;
+            button.GetComponentInChildren<Text> ().text = keyValue.Key;
 
             button.transform.SetParent (menuPanel.transform, false);
             button.transform.position += positionVector;
 
             positionVector[1] -= 250;
 
-            button.GetComponent<Button> ().onClick.AddListener (() => handleClickButton (dish));
+            button.GetComponent<Button> ().onClick.AddListener (() => handleClickButton (keyValue));
 
             //button.GetComponent<Text> ().text = dish;
 
@@ -48,7 +49,7 @@ public class ARDishSelectionMenu : MonoBehaviour {
 
     }
 
-    void handleClickButton (string dish) {
+    void handleClickButton (KeyValuePair<string, string> dish) {
         selectedDish = dish;
         Debug.Log (selectedDish);
         SceneManager.LoadScene ("Main");

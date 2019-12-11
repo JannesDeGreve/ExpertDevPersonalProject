@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
@@ -10,25 +12,21 @@ public class PlacementIndicator : MonoBehaviour {
     private GameObject visual;
     public Text instructionText;
     bool isCreated = false;
-    //bool selectionIsMade = false;
-
-    private GameObject foodPrefab;
-    private GameObject cubePrefab;
 
     private GameObject biefstuk;
     private GameObject lang;
     private GameObject lasagne;
     private GameObject spaghetti;
+    private GameObject lemons;
 
     public List<GameObject> objectArray;
 
-    //public Button firstButton, secondButton;
     private GameObject objectToRender;
 
     void Start () {
 
         // static var
-        Debug.Log (ARDishSelectionMenu.selectedDish);
+        //Debug.Log (ARDishSelectionMenu.selectedDish);
 
         // foodPrefab = (GameObject) Resources.Load ("prefabs/NoodleMeshCleaned", typeof (GameObject));
         // cubePrefab = (GameObject) Resources.Load ("prefabs/Cube", typeof (GameObject));
@@ -36,42 +34,47 @@ public class PlacementIndicator : MonoBehaviour {
         lang = (GameObject) Resources.Load ("prefabs/Lang", typeof (GameObject));
         lasagne = (GameObject) Resources.Load ("prefabs/Lasagne", typeof (GameObject));
         spaghetti = (GameObject) Resources.Load ("prefabs/Spaghetti", typeof (GameObject));
+        lemons = (GameObject) Resources.Load ("prefabs/Lemons", typeof (GameObject));
 
         objectArray.Add (biefstuk);
         objectArray.Add (lang);
         objectArray.Add (lasagne);
         objectArray.Add (spaghetti);
+        objectArray.Add (lemons);
+        // objectArray.Add (loadedObj);
 
-        foreach (GameObject food in objectArray) {
-            food.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
-        }
+        // foreach (GameObject food in objectArray) {
+        //     food.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
+        // }
+
+        objectToRender = spaghetti;
 
         // matchedDishes.Add ("Spaghetti Bolognese");
         // matchedDishes.Add ("Biefstuk met frieten");
         // matchedDishes.Add ("Lasagne");
         // matchedDishes.Add ("Een gerecht met een lange naam");
 
-        switch (ARDishSelectionMenu.selectedDish) {
-            case "Spaghetti Bolognese":
-                Debug.Log ("Spaghetti");
-                objectToRender = spaghetti;
-                break;
-            case "Biefstuk met frieten":
-                Debug.Log ("Biefstuk");
-                objectToRender = biefstuk;
-                break;
-            case "Lasagne":
-                Debug.Log ("Lasagne");
-                objectToRender = lasagne;
-                break;
-            case "Een gerecht met een lange naam":
-                Debug.Log ("Lange naam");
-                objectToRender = lang;
-                break;
-            default:
-                Debug.Log ("Geen gerecht, code klopt niet foei");
-                break;
-        }
+        // switch (ARDishSelectionMenu.selectedDish) {
+        //     case "Spaghetti Bolognese":
+        //         Debug.Log ("Spaghetti");
+        //         objectToRender = spaghetti;
+        //         break;
+        //     case "Biefstuk met frieten":
+        //         Debug.Log ("Biefstuk");
+        //         objectToRender = biefstuk;
+        //         break;
+        //     case "Lasagne":
+        //         Debug.Log ("Lasagne");
+        //         objectToRender = lasagne;
+        //         break;
+        //     case "Een gerecht met een lange naam":
+        //         Debug.Log ("Lange naam");
+        //         objectToRender = lang;
+        //         break;
+        //     default:
+        //         Debug.Log ("Geen gerecht, code klopt niet foei");
+        //         break;
+        // }
 
         //foodPrefab = Instantiate(Resources.Load("prefabs/cube", typeof(GameObject))) as GameObject;
 
@@ -81,25 +84,8 @@ public class PlacementIndicator : MonoBehaviour {
 
         // hide the placement indicator visual
         visual.SetActive (false);
-        // firstButton.onClick.AddListener (handleClickFirstButton);
-        // secondButton.onClick.AddListener (handleClickSecondButton);
 
     }
-
-    // void handleClickFirstButton () {
-    //     objectToRender = 0;
-    //     Destroy (firstButton.gameObject);
-    //     Destroy (secondButton.gameObject);
-    //     selectionIsMade = true;
-    // }
-
-    // void handleClickSecondButton () {
-    //     objectToRender = 1;
-    //     Destroy (firstButton.gameObject);
-    //     Destroy (secondButton.gameObject);
-    //     selectionIsMade = true;
-
-    // }
 
     void Update () {
         // shoot a raycast from the center of the screen
@@ -117,7 +103,7 @@ public class PlacementIndicator : MonoBehaviour {
         // enable the visual if it's disabled
         if (isCreated == false) {
             visual.SetActive (true);
-            //instructionText.text = "Druk op het scherm om jouw gerecht te zien";
+            instructionText.text = "Druk op het scherm om jouw gerecht te zien";
 
         } else {
             visual.SetActive (false);
@@ -133,7 +119,6 @@ public class PlacementIndicator : MonoBehaviour {
             if (touch.phase == TouchPhase.Ended) {
 
                 if (isCreated == false) {
-                    //Instantiate (cubePrefab, hitPose.position, hitPose.rotation);
                     Instantiate (objectToRender, hitPose.position, hitPose.rotation);
                     isCreated = true;
                 }
