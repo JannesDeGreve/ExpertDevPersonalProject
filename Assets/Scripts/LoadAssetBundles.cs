@@ -8,35 +8,40 @@ namespace Assets.SimpleZip {
     public class LoadAssetBundles : MonoBehaviour {
 
         AssetBundle myLoadedAssetBundle;
-        public string path;
+        //public string path;
         public string assetName;
-        //private string uri = "https://storage.googleapis.com/storage/v1/b/ocrfoodappbucket/o/noodles%2Fnoodles.zip";
-        //public string url = "https://storage.googleapis.com/ocrfoodappbucket/noodles/noodles";
-        private string url = "http://jannesdegreve.be/assetbundles/noodles";
-        // Start is called before the first frame update
+        private string url = "http://jannesdegreve.be/assetbundles/";
+        private string urlPart = "osx/spaghettibolognese";
+
+        private string fullpath = "casadimama/biefstukmetfrieten";
+        private string dishNameToRender;
+
         void Start () {
             // LoadAssetBundle (path);
             // InstantiateObjectFromBundle (assetName);
             //instantiateObject ();
             StartCoroutine ("instantiateObject");
+            // dishNameToRender = fullpath.Substring (fullpath.IndexOf ('/') + 1);
+            // Debug.Log ("dish name to render: " + dishNameToRender);
         }
 
-        void LoadAssetBundle (string bundleUrl) {
+        // void LoadAssetBundle (string bundleUrl) {
 
-            myLoadedAssetBundle = AssetBundle.LoadFromFile (bundleUrl);
+        //     myLoadedAssetBundle = AssetBundle.LoadFromFile (bundleUrl);
 
-            Debug.Log (myLoadedAssetBundle == null ? "Failed to load assetBundle" : "AssetBundle succesfully loaded");
+        //     Debug.Log (myLoadedAssetBundle == null ? "Failed to load assetBundle" : "AssetBundle succesfully loaded");
 
-        }
+        // }
 
-        void InstantiateObjectFromBundle (string objectName) {
-            var prefab = myLoadedAssetBundle.LoadAsset (objectName);
-            Instantiate (prefab);
-        }
+        // void InstantiateObjectFromBundle (string objectName) {
+        //     var prefab = myLoadedAssetBundle.LoadAsset (objectName);
+        //     Instantiate (prefab);
+        // }
 
         IEnumerator instantiateObject () {
+            Debug.Log (url + urlPart);
             //string url = "file:///" + Application.dataPath + "/AssetBundles/" + assetBundleName;
-            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle (url, 0);
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle (url + urlPart, 0);
             yield return request.SendWebRequest ();
 
             if (request.isNetworkError) {
@@ -51,6 +56,7 @@ namespace Assets.SimpleZip {
 
             //GameObject sprite = bundle.LoadAsset<GameObject> ("Sprite");
             Instantiate (noodles);
+            Debug.Log (noodles);
             //Instantiate (sprite);
 
         }
