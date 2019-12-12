@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4746ea79a25094c6a925072860401f11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  assetName: spaghettibolognese
+  assetName: noedels
 --- !u!4 &312998269
 Transform:
   m_ObjectHideFlags: 0

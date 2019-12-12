@@ -105,21 +105,40 @@ public class RestaurantSelectionScreen : MonoBehaviour {
     public RootObject responses;
     public Document genericResponses;
 
+    public Text description;
+    public GameObject loadingCircle;
+    public GameObject disabled;
+    public Button restartButton;
+    public Button continueButton;
+
     void Start () {
 
         // Set the headers
         headers = new Dictionary<string, string> ();
         headers.Add ("Content-Type", "application/json; charset=UTF-8");
 
+        disabled.SetActive (false);
+
         // locationInfo = new LatLng ();
 
         // locationInfo.latitude = 50.8493271f;
-        // locationInfo.longitude = 3.27963328f;
+        // locationInfo.longitude = 3.27963328f;		
+        restartButton.onClick.AddListener (handleRestartButton);
+        continueButton.onClick.AddListener (handleContinueButton);
 
         // Start locationhandler and fetchrestaurantdata
-        StartCoroutine ("LocationHandler");
-        StartCoroutine ("FetchRestaurantData");
         StartCoroutine ("FetchGenericData");
+        StartCoroutine ("LocationHandler");
+    }
+
+    void handleRestartButton () {
+        StartCoroutine ("LocationHandler");
+    }
+
+    void handleContinueButton () {
+        Debug.Log ("continue");
+        SceneManager.LoadScene ("OCROnboarding");
+
     }
 
     private IEnumerator FetchRestaurantData () {
@@ -199,11 +218,21 @@ public class RestaurantSelectionScreen : MonoBehaviour {
         Debug.Log ("script started");
         Debug.Log ("enabled:" + Input.location.isEnabledByUser);
 
+        description.text = "We bekijken waar je bent aan de hand van jouw locatie.";
+        loadingCircle.SetActive (true);
+        disabled.SetActive (false);
+
         locationInfo = new LatLng ();
 
         // First, check if user has location service enabled
-        if (!Input.location.isEnabledByUser)
+        if (!Input.location.isEnabledByUser) {
+            Debug.Log ("not enabled");
+            description.text = "Het ziet ernaar uit dat jouw locatie niet is ingeschakeld.";
+            loadingCircle.SetActive (false);
+            disabled.SetActive (true);
             yield break;
+
+        }
         Debug.Log ("Enabled check");
 
         // Start service before querying location
@@ -230,6 +259,8 @@ public class RestaurantSelectionScreen : MonoBehaviour {
             // Access granted and location value could be retrieved
             locationInfo.latitude = Input.location.lastData.latitude;
             locationInfo.longitude = Input.location.lastData.longitude;
+            StartCoroutine ("FetchRestaurantData");
+
             CheckLocation ();
         }
 
@@ -288,14 +319,6 @@ public class RestaurantSelectionScreen : MonoBehaviour {
             return;
         }
 
-    }
-
-    void checkDishAndPathList () {
-        foreach (KeyValuePair<string, string> keyValue in allDishesFromCurrentRestaurant) {
-            Debug.Log ("key: " + keyValue.Key);
-        }
-
-        //Debug.Log (allDishesFromCurrentRestaurant[0]);
     }
 
     // Update is called once per frame

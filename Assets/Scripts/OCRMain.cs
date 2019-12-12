@@ -204,26 +204,34 @@ public class OCRMain : MonoBehaviour {
 
                 // loop door alle gedecteerde woorden
                 foreach (string s in detectedTextArray) {
+                    Debug.Log ("in detectedtextarray loop");
 
                     // rest de boolean
                     bool hasBeenAdded = false;
 
-                    //loop door alle specifieke gerechten
-                    foreach (KeyValuePair<string, string> keyValue in RestaurantSelectionScreen.allDishesFromCurrentRestaurant) {
-                        if (keyValue.Key.ToLower () == s.ToLower ()) {
+                    if (RestaurantSelectionScreen.allDishesFromCurrentRestaurant != null) {
+                        Debug.Log ("In specifieke dishes loop");
+                        //loop door alle specifieke gerechten
+                        foreach (KeyValuePair<string, string> keyValue in RestaurantSelectionScreen.allDishesFromCurrentRestaurant) {
+                            if (keyValue.Key.ToLower () == s.ToLower ()) {
 
-                            // Er is een match tussen de gedetecteerde tekst en locatie gebaseerde menukaart
-                            Debug.Log ("Er is een match: " + s);
-                            matchedDishesWithPath.Add (keyValue.Key, keyValue.Value);
-                            hasBeenAdded = true;
+                                // Er is een match tussen de gedetecteerde tekst en locatie gebaseerde menukaart
+                                Debug.Log ("Er is een match: " + s);
+                                matchedDishesWithPath.Add (keyValue.Key, keyValue.Value);
+                                hasBeenAdded = true;
+                            }
                         }
-                    }
 
-                    // Er was geen match tussen de gedetecteerde tekst
-                    // Voeg toe aan de volgende List die met generieke gerechten checkt
-                    if (hasBeenAdded == false) {
+                        // Er was geen match tussen de gedetecteerde tekst
+                        // Voeg toe aan de volgende List die met generieke gerechten checkt
+                        if (hasBeenAdded == false) {
+                            remainingDishesLeftToMatchWithGeneric.Add (s);
+
+                        }
+                    } else {
+                        Debug.Log ("specifieke loop overgeslagen");
+
                         remainingDishesLeftToMatchWithGeneric.Add (s);
-
                     }
 
                 }

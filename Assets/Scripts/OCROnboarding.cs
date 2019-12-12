@@ -6,46 +6,32 @@ using UnityEngine.UI;
 
 public class OCROnboarding : MonoBehaviour {
 
-    // public Button backButton;
-    // public Button continueButton;
     public Text currentRestaurant;
+    public Slider slider;
 
-    // Start is called before the first frame update
-    // void Start () {
-    //     backButton.onClick.AddListener (handleClickBackButton);
-    //     continueButton.onClick.AddListener (handleClickContinueButton);
-
-    // }
+    private float maxTime = 3f;
+    private float activeTime = 0f;
 
     void Start () {
-        //Start the coroutine we define below named ExampleCoroutine.
-        currentRestaurant.text = RestaurantSelectionScreen.currentLocation;
-        StartCoroutine (WaitBeforeNextScene ());
+        // Check if there is a restaurant name aka location is enabled.
+        if (RestaurantSelectionScreen.currentLocation != null) {
+            currentRestaurant.text = RestaurantSelectionScreen.currentLocation;
+        }
     }
 
-    IEnumerator WaitBeforeNextScene () {
-        //Print the time of when the function is first called.
-        Debug.Log ("Started Coroutine at timestamp : " + Time.time);
+    public void Update () {
+        // progress bar, wait for 3 seconds before going to the next scene.
+        if (activeTime < maxTime) {
+            activeTime += Time.deltaTime;
+            var percent = activeTime / maxTime;
+            //Debug.Log (percent);
+            slider.value = percent;
+        } else {
+            slider.value = 1f;
+            SceneManager.LoadScene ("OCRMain");
 
-        //yield on a new YieldInstruction that waits for 5 seconds.
-        yield return new WaitForSeconds (3);
-
-        //After we have waited 5 seconds print the time again.
-        Debug.Log ("Finished Coroutine at timestamp : " + Time.time);
-        SceneManager.LoadScene ("OCRMain");
-
-    }
-
-    // void handleClickBackButton () {
-    //     SceneManager.LoadScene ("Startscreen");
-    // }
-
-    // void handleClickContinueButton () {
-    //     SceneManager.LoadScene ("OCRMain");
-    // }
-
-    // Update is called once per frame
-    void Update () {
+        }
 
     }
+
 }

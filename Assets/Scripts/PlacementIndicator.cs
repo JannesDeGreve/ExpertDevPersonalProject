@@ -16,6 +16,7 @@ public class PlacementIndicator : MonoBehaviour {
     private ARRaycastManager rayManager;
     private GameObject visual;
     public Text instructionText;
+    public Text dishText;
     bool isCreated = false;
 
     private string path;
@@ -39,6 +40,7 @@ public class PlacementIndicator : MonoBehaviour {
 
         dishName = ARDishSelectionMenu.selectedDish.Key;
         path = ARDishSelectionMenu.selectedDish.Value;
+        dishText.text = dishName;
 
         Debug.Log ("voor operatie " + path);
 

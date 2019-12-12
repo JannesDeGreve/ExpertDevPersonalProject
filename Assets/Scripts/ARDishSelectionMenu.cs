@@ -14,19 +14,13 @@ public class ARDishSelectionMenu : MonoBehaviour {
     [SerializeField]
     GameObject buttonPrefab;
 
-    //public static string selectedDish;
+    public Button restartScanButton;
+
     public static KeyValuePair<string, string> selectedDish;
 
-    //public List<string> matchedDishes;
-    public Vector3 positionVector = new Vector3 (0, 0, 0);
-
     void Start () {
-        // matchedDishes = new List<string> ();
 
-        // matchedDishes.Add ("Spaghetti Bolognese");
-        // matchedDishes.Add ("Biefstuk met frieten");
-        // matchedDishes.Add ("Lasagne");
-        // matchedDishes.Add ("Een gerecht met een lange naam");
+        restartScanButton.onClick.AddListener (handleClickRestart);
 
         foreach (KeyValuePair<string, string> keyValue in OCRMain.matchedDishesWithPath) {
             Debug.Log (keyValue.Key);
@@ -35,29 +29,20 @@ public class ARDishSelectionMenu : MonoBehaviour {
             button.GetComponentInChildren<Text> ().text = keyValue.Key;
 
             button.transform.SetParent (menuPanel.transform, false);
-            button.transform.position += positionVector;
-
-            positionVector[1] -= 250;
 
             button.GetComponent<Button> ().onClick.AddListener (() => handleClickButton (keyValue));
-
-            //button.GetComponent<Text> ().text = dish;
-
-            // button.GetComponent<Text> ().text = dish;
-            // button.transform.parent = menuPanel;
         }
 
+    }
+
+    void handleClickRestart () {
+        SceneManager.LoadScene ("OCRMain");
     }
 
     void handleClickButton (KeyValuePair<string, string> dish) {
         selectedDish = dish;
         Debug.Log (selectedDish);
         SceneManager.LoadScene ("Main");
-
     }
 
-    // Update is called once per frame
-    void Update () {
-
-    }
 }
