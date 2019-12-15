@@ -77,8 +77,12 @@ public class OCRMain : MonoBehaviour {
         TEXT_DETECTION
     }
 
+    public GameObject loadingCircle;
+
     // Start is called before the first frame update
     void Start () {
+
+        loadingCircle.SetActive (false);
 
         headers = new Dictionary<string, string> ();
         headers.Add ("Content-Type", "application/json; charset=UTF-8");
@@ -143,6 +147,8 @@ public class OCRMain : MonoBehaviour {
         byte[] jpg = texture2D.EncodeToJPG ();
         string base64 = System.Convert.ToBase64String (jpg);
 
+        loadingCircle.SetActive (true);
+
         AnnotateImageRequests requests = new AnnotateImageRequests ();
         requests.requests = new List<AnnotateImageRequest> ();
 
@@ -172,7 +178,7 @@ public class OCRMain : MonoBehaviour {
                     AnnotateImageResponses responses = JsonUtility.FromJson<AnnotateImageResponses> (www.text);
                     // SendMessage, BroadcastMessage or someting like that.
                     Debug.Log ("eerste log na annotate" + responses);
-                    Sample_OnAnnotateImageResponses (responses);
+                    parseDetectedText (responses);
                 } else {
                     Debug.Log ("Error: " + www.error);
                 }
@@ -181,7 +187,7 @@ public class OCRMain : MonoBehaviour {
         //}
     }
 
-    void Sample_OnAnnotateImageResponses (AnnotateImageResponses responses) {
+    void parseDetectedText (AnnotateImageResponses responses) {
         Debug.Log ("eerste log IN annotate");
         if (responses.responses.Count > 0) {
 

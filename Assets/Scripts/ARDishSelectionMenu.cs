@@ -20,14 +20,6 @@ public class ARDishSelectionMenu : MonoBehaviour {
     public static string selectedDish;
     public static string selectedPath;
 
-    // public class dishesList {
-    //     string[] dishObject;
-    // }
-
-    // public class DishObject {
-    //     string dishName;
-    //     string dishPath;
-    // }
     [System.Serializable]
     public class testArrayData {
         public string testDishName { get; set; }

@@ -294,14 +294,8 @@ public class RestaurantSelectionScreen : MonoBehaviour {
                         Debug.Log (dishAndPath.mapValue.fields.dish.stringValue);
                         Debug.Log (dishAndPath.mapValue.fields.path.stringValue);
 
-                        //Dictionary<string, string> dishAndPathDictionary = new Dictionary<string, string> ();
-
                         allDishesFromCurrentRestaurant.Add (dishAndPath.mapValue.fields.dish.stringValue, dishAndPath.mapValue.fields.path.stringValue);
-
-                        //allDishesFromCurrentRestaurant.Add (dishAndPathDictionary);
                     }
-
-                    //checkDishAndPathList ();
 
                     // load the next scene
                     SceneManager.LoadScene ("OCROnboarding");

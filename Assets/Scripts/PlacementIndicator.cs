@@ -10,13 +10,16 @@ using UnityEngine.XR.ARSubsystems;
 
 public class PlacementIndicator : MonoBehaviour {
 
+    //ARPlaneManager manager = new ARPlaneManager ();
+
     private AssetBundle bundle;
     private string url = "http://jannesdegreve.be/assetbundles";
+    private bool showPlanes;
 
     private ARRaycastManager rayManager;
     private GameObject visual;
     public Text instructionText;
-    public Text dishText;
+    public Text loadingText;
     bool isCreated = false;
 
     private string path;
@@ -44,19 +47,15 @@ public class PlacementIndicator : MonoBehaviour {
 
     void Start () {
 
+        if (bundle != null) {
+            bundle.Unload (true);
+        }
+
+        showPlanes = true;
         indexToRenderVariable = ARDishSelectionMenu.selectedIndex;
 
         coroutine = loadSelectedObjectFromServer (indexToRenderVariable);
         StartCoroutine (coroutine);
-
-        // Debug.Log ("selected in main: " + selectedDish);
-        // Debug.Log ("index in array: " + dishObjectsArray.indexOf (dishObjectsArray, [selectedDish, selectedPath]));
-
-        // static var
-        //Debug.Log (ARDishSelectionMenu.selectedDish);
-        // Debug.Log ("Key: " + ARDishSelectionMenu.selectedDish[0]);
-
-        //StartCoroutine ("loadSelectedObjectFromServer");
 
         // get the components
         rayManager = FindObjectOfType<ARRaycastManager> ();
@@ -69,9 +68,10 @@ public class PlacementIndicator : MonoBehaviour {
 
     IEnumerator loadSelectedObjectFromServer (int indexToRender) {
         DishIsLoading = true;
+        loadingText.text = "aan het laden...";
 
         dishName = ARDishSelectionMenu.newDishObjectArray[indexToRender].testDishName;
-        dishText.text = dishName;
+        // dishText.text = dishName;
 
         path = ARDishSelectionMenu.newDishObjectArray[indexToRender].testDishPath;
 
@@ -89,6 +89,7 @@ public class PlacementIndicator : MonoBehaviour {
 
         if (request.isNetworkError) {
             Debug.Log ("Error: " + request.error);
+            loadingText.text = "er ging iets fout";
         } else {
             Debug.Log (request.downloadHandler);
         }
@@ -100,8 +101,9 @@ public class PlacementIndicator : MonoBehaviour {
         //objectToRender = loadedObject;
         Debug.Log (objectToRender.name);
 
-        objectToRender.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
+        //objectToRender.transform.localScale = new Vector3 (0.05f, 0.05f, 0.05f);
         DishIsLoading = false;
+        loadingText.text = "";
 
     }
 
@@ -119,6 +121,7 @@ public class PlacementIndicator : MonoBehaviour {
             }
 
             DishIsLoading = true;
+            OnTogglePlanes (true);
 
             Destroy (objectInstance);
             bundle.Unload (true);
@@ -139,6 +142,7 @@ public class PlacementIndicator : MonoBehaviour {
             }
 
             DishIsLoading = true;
+            OnTogglePlanes (true);
 
             Destroy (objectInstance);
             bundle.Unload (true);
@@ -159,35 +163,41 @@ public class PlacementIndicator : MonoBehaviour {
         if (hits.Count > 0) {
             transform.position = hits[0].pose.position;
             transform.rotation = hits[0].pose.rotation;
-        }
 
-        // if (selectionIsMade == true) {
+            if (isCreated == false) {
+                visual.SetActive (true);
+                instructionText.text = "Druk op het scherm om jouw gerecht te zien";
 
-        // enable the visual if it's disabled
-        if (isCreated == false) {
-            visual.SetActive (true);
-            instructionText.text = "Druk op het scherm om jouw gerecht te zien";
+            } else {
+                visual.SetActive (false);
+            }
 
-        } else {
-            visual.SetActive (false);
-        }
+            if (DishIsLoading == false) {
+                if (Input.touchCount > 0) {
+                    Touch touch = Input.GetTouch (0);
+                    var hitPose = hits[0].pose;
+                    instructionText.text = "Swipe om andere \ngerechten te zien.";
 
-        if (DishIsLoading == false) {
-            if (Input.touchCount > 0) {
-                Touch touch = Input.GetTouch (0);
-                var hitPose = hits[0].pose;
-                instructionText.text = "Swipe om andere \ngerechten te zien.";
+                    if (touch.phase == TouchPhase.Ended) {
 
-                if (touch.phase == TouchPhase.Ended) {
-
-                    if (isCreated == false) {
-                        objectInstance = (GameObject) Instantiate (objectToRender, hitPose.position, hitPose.rotation);
-                        isCreated = true;
+                        if (isCreated == false) {
+                            objectInstance = (GameObject) Instantiate (objectToRender, hitPose.position, hitPose.rotation);
+                            OnTogglePlanes (false);
+                            isCreated = true;
+                        }
                     }
                 }
             }
         }
+    }
 
-        // }
+    public void OnTogglePlanes (bool flag) {
+        showPlanes = flag;
+        foreach (GameObject plane in GameObject.FindGameObjectsWithTag ("plane")) {
+            Renderer r = plane.GetComponent<Renderer> ();
+            ARPlaneMeshVisualizer t = plane.GetComponent<ARPlaneMeshVisualizer> ();
+            r.enabled = flag;
+            t.enabled = flag;
+        }
     }
 }
