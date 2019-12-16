@@ -261,7 +261,7 @@ public class RestaurantSelectionScreen : MonoBehaviour {
             locationInfo.longitude = Input.location.lastData.longitude;
             StartCoroutine ("FetchRestaurantData");
 
-            CheckLocation ();
+            //CheckLocation ();
         }
 
         // Stop service if there is no need to query location updates continuously
@@ -274,7 +274,8 @@ public class RestaurantSelectionScreen : MonoBehaviour {
         allDishesFromCurrentRestaurant = new Dictionary<string, string> ();
 
         //Debug.Log (responses.documents[0].name);
-        Debug.Log (locationInfo.latitude);
+        Debug.Log ("latitude : " + locationInfo.latitude);
+        Debug.Log ("longitude : " + locationInfo.longitude);
 
         if (responses != null && locationInfo.latitude != null && locationInfo.longitude != null) {
 
@@ -286,7 +287,7 @@ public class RestaurantSelectionScreen : MonoBehaviour {
                 Debug.Log (restaurantLatitude);
                 Debug.Log (restaurantLongitude);
 
-                if (locationInfo.latitude <= restaurantLatitude + 0.0005 && locationInfo.latitude >= restaurantLatitude - 0.0005 && locationInfo.longitude <= restaurantLongitude + 0.0005 && locationInfo.longitude >= restaurantLongitude - 0.0005) {
+                if (locationInfo.latitude <= restaurantLatitude + 0.01 && locationInfo.latitude >= restaurantLatitude - 0.01 && locationInfo.longitude <= restaurantLongitude + 0.01 && locationInfo.longitude >= restaurantLongitude - 0.01) {
                     Debug.Log ("juiste locatie");
                     currentLocation = restaurant.fields.restaurantName.stringValue;
 
@@ -298,8 +299,8 @@ public class RestaurantSelectionScreen : MonoBehaviour {
                     }
 
                     // load the next scene
-                    SceneManager.LoadScene ("OCROnboarding");
-                    return;
+                    // SceneManager.LoadScene ("OCROnboarding");
+                    // return;
 
                 } else {
                     Debug.Log ("niet juiste locatie");
@@ -308,6 +309,8 @@ public class RestaurantSelectionScreen : MonoBehaviour {
             }
 
             Debug.Log (currentLocation);
+            SceneManager.LoadScene ("OCROnboarding");
+            return;
 
         } else {
             return;
