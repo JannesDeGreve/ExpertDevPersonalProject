@@ -3,9 +3,22 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Assets.SimpleZip {
 
-    public class LoadAssetBundles : MonoBehaviour {
+/* 
+
+--------------
+
+Testscript, wordt niet in de build zelf gebruikt
+
+--------------
+
+*/
+
+namespace Assets.SimpleZip
+{
+
+    public class LoadAssetBundles : MonoBehaviour
+    {
 
         AssetBundle myLoadedAssetBundle;
         //public string path;
@@ -13,14 +26,15 @@ namespace Assets.SimpleZip {
         private string url = "http://jannesdegreve.be/assetbundles/";
         private string urlPart = "osx/spaghettibolognese";
 
-        private string fullpath = "casadimama/biefstukmetfrieten";
+        //private string fullpath = "casadimama/biefstukmetfrieten";
         private string dishNameToRender;
 
-        void Start () {
+        void Start()
+        {
             // LoadAssetBundle (path);
             // InstantiateObjectFromBundle (assetName);
             //instantiateObject ();
-            StartCoroutine ("instantiateObject");
+            StartCoroutine("instantiateObject");
             // dishNameToRender = fullpath.Substring (fullpath.IndexOf ('/') + 1);
             // Debug.Log ("dish name to render: " + dishNameToRender);
         }
@@ -38,25 +52,29 @@ namespace Assets.SimpleZip {
         //     Instantiate (prefab);
         // }
 
-        IEnumerator instantiateObject () {
-            Debug.Log (url + urlPart);
+        IEnumerator instantiateObject()
+        {
+            Debug.Log(url + urlPart);
             //string url = "file:///" + Application.dataPath + "/AssetBundles/" + assetBundleName;
-            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle (url + urlPart, 0);
-            yield return request.SendWebRequest ();
+            UnityWebRequest request = UnityWebRequestAssetBundle.GetAssetBundle(url + urlPart, 0);
+            yield return request.SendWebRequest();
 
-            if (request.isNetworkError) {
-                Debug.Log ("Error: " + request.error);
-            } else {
-                Debug.Log (request.downloadHandler);
+            if (request.isNetworkError)
+            {
+                Debug.Log("Error: " + request.error);
             }
-            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent (request);
-            GameObject noodles = bundle.LoadAsset<GameObject> (assetName);
+            else
+            {
+                Debug.Log(request.downloadHandler);
+            }
+            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(request);
+            GameObject noodles = bundle.LoadAsset<GameObject>(assetName);
 
-            Debug.Log (noodles == null ? "Failed to load assetBundle" : "AssetBundle succesfully loaded");
+            Debug.Log(noodles == null ? "Failed to load assetBundle" : "AssetBundle succesfully loaded");
 
             //GameObject sprite = bundle.LoadAsset<GameObject> ("Sprite");
-            Instantiate (noodles);
-            Debug.Log (noodles);
+            Instantiate(noodles);
+            Debug.Log(noodles);
             //Instantiate (sprite);
 
         }

@@ -1,7 +1,17 @@
-﻿using System;
+﻿/* 
+
+Code from the following tutorial:
+https://www.youtube.com/watch?v=jbFYYbu5bdc
+https://unity3d.college/2018/04/24/mobile-swipe-detection-in-unity3d/
+
+A simple script to detect swipes. Returns the direction and start + end points
+
+*/
+using System;
 using UnityEngine;
 
-public class SwipeDetector : MonoBehaviour {
+public class SwipeDetector : MonoBehaviour
+{
     private Vector2 fingerDownPosition;
     private Vector2 fingerUpPosition;
 
@@ -13,71 +23,89 @@ public class SwipeDetector : MonoBehaviour {
 
     public static event Action<SwipeData> OnSwipe = delegate { };
 
-    private void Update () {
-        foreach (Touch touch in Input.touches) {
-            if (touch.phase == TouchPhase.Began) {
+    private void Update()
+    {
+        foreach (Touch touch in Input.touches)
+        {
+            if (touch.phase == TouchPhase.Began)
+            {
                 fingerUpPosition = touch.position;
                 fingerDownPosition = touch.position;
             }
 
-            if (!detectSwipeOnlyAfterRelease && touch.phase == TouchPhase.Moved) {
+            if (!detectSwipeOnlyAfterRelease && touch.phase == TouchPhase.Moved)
+            {
                 fingerDownPosition = touch.position;
-                DetectSwipe ();
+                DetectSwipe();
             }
 
-            if (touch.phase == TouchPhase.Ended) {
+            if (touch.phase == TouchPhase.Ended)
+            {
                 fingerDownPosition = touch.position;
-                DetectSwipe ();
+                DetectSwipe();
             }
         }
     }
 
-    private void DetectSwipe () {
-        if (SwipeDistanceCheckMet ()) {
-            if (IsVerticalSwipe ()) {
+    private void DetectSwipe()
+    {
+        if (SwipeDistanceCheckMet())
+        {
+            if (IsVerticalSwipe())
+            {
                 var direction = fingerDownPosition.y - fingerUpPosition.y > 0 ? SwipeDirection.Up : SwipeDirection.Down;
-                SendSwipe (direction);
-            } else {
+                SendSwipe(direction);
+            }
+            else
+            {
                 var direction = fingerDownPosition.x - fingerUpPosition.x > 0 ? SwipeDirection.Right : SwipeDirection.Left;
-                SendSwipe (direction);
+                SendSwipe(direction);
             }
             fingerUpPosition = fingerDownPosition;
         }
     }
 
-    private bool IsVerticalSwipe () {
-        return VerticalMovementDistance () > HorizontalMovementDistance ();
+    private bool IsVerticalSwipe()
+    {
+        return VerticalMovementDistance() > HorizontalMovementDistance();
     }
 
-    private bool SwipeDistanceCheckMet () {
-        return VerticalMovementDistance () > minDistanceForSwipe || HorizontalMovementDistance () > minDistanceForSwipe;
+    private bool SwipeDistanceCheckMet()
+    {
+        return VerticalMovementDistance() > minDistanceForSwipe || HorizontalMovementDistance() > minDistanceForSwipe;
     }
 
-    private float VerticalMovementDistance () {
-        return Mathf.Abs (fingerDownPosition.y - fingerUpPosition.y);
+    private float VerticalMovementDistance()
+    {
+        return Mathf.Abs(fingerDownPosition.y - fingerUpPosition.y);
     }
 
-    private float HorizontalMovementDistance () {
-        return Mathf.Abs (fingerDownPosition.x - fingerUpPosition.x);
+    private float HorizontalMovementDistance()
+    {
+        return Mathf.Abs(fingerDownPosition.x - fingerUpPosition.x);
     }
 
-    private void SendSwipe (SwipeDirection direction) {
-        SwipeData swipeData = new SwipeData () {
+    private void SendSwipe(SwipeDirection direction)
+    {
+        SwipeData swipeData = new SwipeData()
+        {
             Direction = direction,
             StartPosition = fingerDownPosition,
             EndPosition = fingerUpPosition
         };
-        OnSwipe (swipeData);
+        OnSwipe(swipeData);
     }
 }
 
-public struct SwipeData {
+public struct SwipeData
+{
     public Vector2 StartPosition;
     public Vector2 EndPosition;
     public SwipeDirection Direction;
 }
 
-public enum SwipeDirection {
+public enum SwipeDirection
+{
     Up,
     Down,
     Left,
